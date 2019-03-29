@@ -1,0 +1,61 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: bot
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: youtrack-tg-bot
+            image: registry.infobis.local/youtrack-tg-bot
+            volumeMounts:
+            - name: config
+              mountPath: /opt/app/config
+            - name: nfs
+              mountPath: /opt/app/last
+            env:
+            - name: configPath
+              value: /opt/app/config/config.json
+          restartPolicy: Never
+          volumes:
+          - name: config
+            configMap:
+              name: youtrack-tg-bot-config
+          - name: nfs
+            persistentVolumeClaim:
+              claimName: youtrack-bot-claim
+
+---
+apiVersion: v1
+data:
+  config.json: |
+    {}
+kind: ConfigMap
+metadata:
+  name: youtrack-tg-bot-config
+  namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: managed-nfs-storage
+    volume.beta.kubernetes.io/storage-provisioner: fuseim.pri/ifs
+  name: youtrack-bot-claim
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+status:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 1Mi
+  phase: Bound

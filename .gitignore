@@ -6,3 +6,5 @@ src/bot-config.json
 logs/
 _bot-config.json
 app2.json
+/config.json
+/package-lock.json

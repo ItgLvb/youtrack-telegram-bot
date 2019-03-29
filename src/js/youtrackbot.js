@@ -31,7 +31,6 @@ class YoutrackBot {
 
         this.yt = new Youtrack(this.config);
 
-        let token = await this.yt.getAccessToken();
         let last = await this._getUpdatedAfter();
 
         this.issues = await this.yt.issuesChanges(this.projectName, {updatedAfter: last.ts, max: max});
@@ -40,7 +39,7 @@ class YoutrackBot {
     }
 
     async _getUpdatedAfter() {
-        let now = moment().subtract(10, 'days');
+        let now = moment().subtract(1, 'days');
         let default_last = {ts: now.format('x'), s: now.format(DATETIME_FORMAT)};
 
         let last = null;
