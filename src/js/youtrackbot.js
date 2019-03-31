@@ -45,7 +45,7 @@ class YoutrackBot {
         let last = null;
 
         try {
-            last = require(`../${this.file}`);
+            last = require(`${this.file}`);
         } catch (err) {
             debug('_getUpdatedAfter() err=', err);
             debug('_getUpdatedAfter() fallback to default value:', default_last);
