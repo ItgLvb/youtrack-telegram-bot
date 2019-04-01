@@ -15,6 +15,7 @@ class Youtrack {
     }
 
     async issuesChanges(projectName, options = {updatedAfter: moment().subtract(1, 'days').format('x'), max: 10}) {
+        console.log("get issues from " + projectName + " with options: " + JSON.stringify(options));
         let issues = await this.issuesByProject(projectName, options);
         let issuesWithChanges = [];
         for (let issue of issues) {

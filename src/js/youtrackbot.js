@@ -5,6 +5,7 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 const debug = require('debug')('youtrack:bot');
+const lastPath = (process.env.lastPath || "last");
 const Youtrack = require('./youtrack');
 
 debug.log = console.log.bind(console);
@@ -18,7 +19,8 @@ class YoutrackBot {
         this.config = config;
         this.telegram = Object.assign({token: null, chatId: null}, telegramOptions);
         this.youtrackIssueBaseUrl = `${this.config.youtrack.baseUrl}/issue/`;
-        this.file = `last/${this.projectName}_last_request.json`;
+
+        this.file = `${lastPath}/${this.projectName}_last_request.json`;
 
         this.bot = new TBot(this.telegram.token);
         debug('constructor() bot created.');
@@ -33,6 +35,7 @@ class YoutrackBot {
 
         let last = await this._getUpdatedAfter();
 
+        console.log("get updates after " + JSON.stringify(last));
         this.issues = await this.yt.issuesChanges(this.projectName, {updatedAfter: last.ts, max: max});
 
         return this._process();
@@ -45,8 +48,10 @@ class YoutrackBot {
         let last = null;
 
         try {
-            last = require(`${this.file}`);
+            last = require(this.file);
+
         } catch (err) {
+            console.log(`can not read file ${this.file} err=${err}`);
             debug('_getUpdatedAfter() err=', err);
             debug('_getUpdatedAfter() fallback to default value:', default_last);
             last = default_last;
